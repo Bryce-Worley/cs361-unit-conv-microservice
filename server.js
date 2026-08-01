@@ -137,7 +137,29 @@ app.get('/convert', (req, res) => {
     });
 });
 
+// Default units setting
 
+// Countries where imperial units are used (United States, Liberia, Myanmar)
+const imperialRegions = ['US', 'LR', 'MM'];
+
+app.get('/default-units', (req, res) => {
+    const { locale } = req.query;
+
+    if (!locale || typeof locale !== 'string') {
+        return res.status(400).json({ error_code: 'INVALID_PARAMETERS' });
+    }
+    
+    // Locale string "en-US"; region "US"; Locales with no region fall back to metric.
+    const region = locale.split('-')[1]?.toUpperCase() || null;
+    let units;
+    if (region && imperialRegions.includes(region)) {
+        units = 'imperial';
+    } 
+    else {
+        units = 'metric';
+    }
+    return res.status(200).json({ locale, region, units });
+});
 
 // Use the port from the environment variable or default to 3001
 const PORT = process.env.PORT || 3001;
